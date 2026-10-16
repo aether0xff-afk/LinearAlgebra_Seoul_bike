@@ -1,0 +1,40 @@
+name: Reproduce analysis
+on:
+  push:
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Regenerate all metrics and PNG figures
+        run: python -m src.run_analysis
+      - name: Check source data and calculated test values
+        shell: bash
+        run: |
+          python - <<'PY'
+          import pandas as pd
+          raw = pd.read_csv("data/SeoulBikeData.csv")
+          score = pd.read_csv("results/metrics.csv")
+          assert len(raw) == 8760
+          assert (raw["Functioning Day"] == "Yes").sum() == 8465
+          actual = score.query("model == 'harmonic_24h_12h' and split == 'test'").iloc[0]
+          assert actual["n"] == 1512
+          assert abs(actual["mae"] - 414.978350) < 0.001
+          assert abs(actual["rmse"] - 541.564138) < 0.001
+          weekend = score.query("model == 'harmonic_weekend' and split == 'test'").iloc[0]
+          assert abs(weekend["mae"] - 405.584383) < 0.001
+          print("All dataset counts and reported MAE/RMSE values match.")
+          PY
+      - name: Upload reproducible figures and per-row predictions
+        uses: actions/upload-artifact@v4
+        with:
+          name: seoul-bike-results
+          path: results/
