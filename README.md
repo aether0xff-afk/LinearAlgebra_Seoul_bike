@@ -1,5 +1,16 @@
 # Seoul Bike Demand — Fourier Regression with Linear Algebra
 
+## 제출용 탐구 보고서 (DOCX / PDF)
+
+- [PDF 제출본](submission/서울_공공자전거_수학적모델링_탐구보고서.pdf)
+- [Word 편집본](submission/서울_공공자전거_수학적모델링_탐구보고서.docx)
+
+제출용 보고서는 **4개 필수 항목**(자료 정리 및 그래프, 함수 모델링 및 실제 예측값, 오차·한계·개선, 탐구 성찰)으로 구성되어 있습니다.
+문서 속 수치는 저장소의 원본 데이터와 `results/`에 있는 검증된 분석 결과를 사용했습니다.
+`scripts/build_submission.py`를 실행해 DOCX를 다시 만들 수 있고, `.github/workflows/publish-submission.yml`은 PDF 변환과 GitHub 업로드까지 자동 수행합니다.
+
+**공개 범위:** 이 저장소는 Public이며 제출 문서에 학번·이름이 포함되어 있습니다.
+
 서울 공공자전거 시간별 대여량을 **24시간 및 12시간 주기의 삼각함수**로 모델링하고,
 행렬의 최소제곱법으로 계수를 구한 뒤 미관측 날짜의 오차를 비교하는 탐구 프로젝트입니다.
 
