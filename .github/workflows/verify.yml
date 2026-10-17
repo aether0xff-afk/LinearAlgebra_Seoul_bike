@@ -33,6 +33,17 @@ jobs:
           assert abs(weekend["mae"] - 405.584383) < 0.001
           print("All dataset counts and reported MAE/RMSE values match.")
           PY
+      - name: Reproduce improved M4 and check recorded coefficients
+        run: |
+          python -m src.improved_model
+          python - <<'PY'
+          import pandas as pd
+          a = pd.read_csv("results/improved_coefficients.csv")
+          assert len(a) == 16
+          assert abs(a.iloc[0]["coefficient"] - 325.530830459) < 0.005
+          assert abs(a.iloc[11]["coefficient"] + 918.28708695) < 0.01
+          print("M4 coefficients reproduce published calculations")
+          PY
       - name: Upload reproducible figures and per-row predictions
         uses: actions/upload-artifact@v4
         with:
