@@ -14,6 +14,16 @@
 서울 공공자전거 시간별 대여량을 **24시간 및 12시간 주기의 삼각함수**로 모델링하고,
 행렬의 최소제곱법으로 계수를 구한 뒤 미관측 날짜의 오차를 비교하는 탐구 프로젝트입니다.
 
+## M4: 계절·기상 조건을 이용한 개선 모델 (2026-10)
+
+기존 M3의 10개 푸리에/주말 회귀계수와 추가 변수 6개(기온/10, 강수량/10, 공휴일, 봄·여름·가을 더미)의 **16개 계수를 모두 새로 최소제곱 추정**합니다. 검증 집합에서 λ ∈ {0, 1, 10, 100, 1000}을 비교해 **λ=0**을 선택했으며, 테스트 결과는 MAE **280.575**, RMSE **389.954**, R² **0.6213**입니다. 날짜 단위 분할과 학습/검증/테스트 수는 M1~M3과 동일합니다.
+
+- 실행: `python -m src.improved_model`
+- 계산 코드: [src/improved_model.py](src/improved_model.py)
+- 실제 M4 계수: [results/improved_coefficients.csv](results/improved_coefficients.csv)
+- 실행 시 생성: `results/improved_validation.csv`, `results/improved_group_errors.csv`
+- 결과는 **관측된 기상 정보가 주어졌을 때 해당 날짜의 수요를 추정**한 것입니다. 미래의 미관측 기상을 예측한 결과는 아닙니다.
+
 ## 검증된 데이터
 
 - **출처:** UCI Machine Learning Repository, [Seoul Bike Sharing Demand](https://archive.ics.uci.edu/dataset/560/seoul+bike+sharing+demand).
