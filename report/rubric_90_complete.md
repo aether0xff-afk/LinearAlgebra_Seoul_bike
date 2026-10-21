@@ -90,7 +90,7 @@ M3은 M2와 같은 주기 기저를 사용하더라도 **10개 계수를 전부 
 =\underset{\boldsymbol\beta}{\arg\min}\|X\boldsymbol\beta-\boldsymbol y\|_2^2.
 \]
 
-정규방정식은 \(X^{\mathsf T}X\boldsymbol\beta=X^{\mathsf T}\boldsymbol y\)이다. 실제 계산은 역행렬을 직접 구하지 않고 \`numpy.linalg.lstsq\`로 수행했다. 입력에 삼각함수가 들어 있어도 미지의 계수에 대해서는 선형이다.
+정규방정식은 \(X^{\mathsf T}X\boldsymbol\beta=X^{\mathsf T}\boldsymbol y\)이다. 실제 계산은 역행렬을 직접 구하지 않고 `numpy.linalg.lstsq`로 수행했다. 입력에 삼각함수가 들어 있어도 미지의 계수에 대해서는 선형이다.
 
 ### 마. 한 시각의 실제 예측값
 
@@ -209,13 +209,13 @@ M3에 비해 M4의 테스트 MAE가
 
 ## 재현
 
-\`\`\`bash
+```bash
 python -m pip install -r requirements.txt
 python -m src.run_analysis
 python -m src.improved_model
 python -m scripts.plot_report_figures
 python -m unittest discover -s tests -v
-\`\`\`
+```
 
 실제 데이터를 확인하고 모델을 재학습하면 그래프와 평가 지표를 다시 만들 수 있다. 단일 연도 내 날짜별 분할이라는 한계는 그대로이며 다음 해 예측으로 해석하지 않는다.
 
