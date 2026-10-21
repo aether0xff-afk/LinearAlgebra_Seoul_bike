@@ -1,0 +1,70 @@
+name: Build current technical report (DOCX and PDF)
+on:
+  push:
+    branches: [main]
+    paths:
+      - report/rubric_90_complete.md
+      - .github/workflows/build-current-technical-report.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  documents:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Pandoc, Korean fonts and PDF converter
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc fonts-nanum librsvg2-bin libreoffice-writer poppler-utils
+          fc-cache -f
+      - name: Convert verified report into editable DOCX
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          text=Path("report/rubric_90_complete.md").read_text(encoding="utf-8")
+          text=text.replace(".svg)", ".png)")
+          Path("report/technical_for_export.md").write_text(text, encoding="utf-8")
+          PY
+          pandoc report/technical_for_export.md \
+            --from=markdown+tex_math_single_backslash+tex_math_dollars \
+            --to=docx --standalone \
+            --reference-doc="submission/서울_공공자전거_수학적모델링_탐구보고서.docx" \
+            --resource-path=".:report:results/figures" \
+            --output="submission/Seoul_Bike_90point_technical.docx"
+      - name: Convert DOCX to PDF
+        run: |
+          libreoffice -env:UserInstallation=file:///tmp/lo_technical_report_9017 \
+            --headless --convert-to pdf --outdir submission \
+            submission/Seoul_Bike_90point_technical.docx
+      - name: Validate content and editable equations
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          import subprocess
+          stem="submission/Seoul_Bike_90point_technical"
+          doc=Path(stem+".docx"); pdf=Path(stem+".pdf")
+          assert doc.exists() and doc.stat().st_size>20000
+          assert pdf.exists() and pdf.stat().st_size>20000
+          with ZipFile(doc) as z:
+              xml=z.read("word/document.xml").decode("utf-8")
+              assert "280.575" in xml and "405.584" in xml
+              assert "m:oMath" in xml, "equations must remain editable"
+          pages=subprocess.check_output(["pdfinfo",str(pdf)],text=True)
+          print(next(x for x in pages.splitlines() if x.startswith("Pages:")))
+          text=subprocess.check_output(["pdftotext",str(pdf),"-"],text=True)
+          assert "280.575" in text and "405.584" in text
+          print("Technical DOCX/PDF and Word equations validated")
+          PY
+      - name: Commit current technical report without replacing original form
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f submission/Seoul_Bike_90point_technical.docx submission/Seoul_Bike_90point_technical.pdf
+          if ! git diff --cached --quiet; then
+            git commit -m "docs: publish updated M1-M4 technical DOCX and PDF"
+            git push origin HEAD:main
+          else
+            echo "Technical report already up to date"
+          fi
