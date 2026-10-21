@@ -1,15 +1,18 @@
 # Seoul Bike Demand — Fourier Regression with Linear Algebra
 
-## 제출용 탐구 보고서 (DOCX / PDF)
+## 보고서 · 그래프 · 제출 자료
 
-- [PDF 제출본](submission/서울_공공자전거_수학적모델링_탐구보고서.pdf)
-- [Word 편집본](submission/서울_공공자전거_수학적모델링_탐구보고서.docx)
+- **[최신 90점 기준 분석 정리 (Markdown)](report/rubric_90_complete.md)** — M1~M4의 정확한 식, 예측값, 계절별 편향·분산 분석, 한계 및 자기평가.
+- **[Matplotlib 그래프 4종](results/figures)** — 실제 원본 CSV에서 다시 계산한 PNG·SVG·벡터 PDF.
+- **[검증된 분석 지표](results/figures/report_model_scores.csv)** — 평균모델과 M1~M4의 MAE·RMSE·R².
+- **[기존 제출용 PDF](submission/서울_공공자전거_수학적모델링_탐구보고서.pdf)** · **[기존 편집용 DOCX](submission/서울_공공자전거_수학적모델링_탐구보고서.docx)**
 
-제출용 보고서는 **4개 필수 항목**(자료 정리 및 그래프, 함수 모델링 및 실제 예측값, 오차·한계·개선, 탐구 성찰)으로 구성되어 있습니다.
-문서 속 수치는 저장소의 원본 데이터와 `results/`에 있는 검증된 분석 결과를 사용했습니다.
-`scripts/build_submission.py`를 실행해 DOCX를 다시 만들 수 있고, `.github/workflows/publish-submission.yml`은 PDF 변환과 GitHub 업로드까지 자동 수행합니다.
-
-**공개 범위:** 이 저장소는 Public이며 제출 문서에 학번·이름이 포함되어 있습니다.
+> **문서 버전 주의:** 위 \`submission/\` PDF·DOCX는 이전 형식으로 생성된 버전이며,
+> 최근 90점 기준의 M4 및 보강된 성찰까지 담은 **최신 보고서와 동일하지 않다**.
+> 최신 분석 내용은 \`report/rubric_90_complete.md\`가 기준이다. 오래된 PDF를 최신 제출본으로 착각하지 않도록 명시한다.
+> PDF/DOCX 자동 생성기는 의도치 않은 덮어쓰기를 막기 위해 수동 실행만 지원한다.
+>
+> 저장소는 **Public**이다. 제출 파일에 학번과 이름이 포함되어 있으므로 공개 범위를 확인해야 한다.
 
 서울 공공자전거 시간별 대여량을 **24시간 및 12시간 주기의 삼각함수**로 모델링하고,
 행렬의 최소제곱법으로 계수를 구한 뒤 미관측 날짜의 오차를 비교하는 탐구 프로젝트입니다.
@@ -41,7 +44,8 @@
 - **Baseline:** 학습 데이터 전체의 평균 대여량만 예측.
 - **M1 (24h):** `ŷ = a0 + a1 sin(2πt/24) + b1 cos(2πt/24)`.
 - **M2 (24h + 12h):** M1에 `a2 sin(4πt/24) + b2 cos(4πt/24)` 추가.
-- **M3 (weekend interaction):** M2에 `w(c0 + c1 sin(2πt/24) + d1 cos(2πt/24) + c2 sin(4πt/24) + d2 cos(4πt/24))` 추가.
+- **M3 (주말 상호작용):** M2와 동일한 5개 기저함수 + 주말 지표와의 곱 5개로 **10개 계수를 새로 학습**. M2의 계수를 그대로 재사용하지 않음.
+- **M4 (기상·계절):** M3의 10개 계수 + 관측 기온·강수량·공휴일·계절 더미 6개를 **16개 모두 다시 학습**. `λ=0`이 검증 RMSE에서 최적.
 
 각 행은 한 시각의 삼각함수값으로 이루어진 설계행렬 `X`를 만들고,
 `min ||Xβ-y||²`를 푸는 **선형 최소제곱법**(`numpy.linalg.lstsq`)으로 회귀계수를 얻습니다.
@@ -58,6 +62,8 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
 python -m src.run_analysis
+python -m src.improved_model
+python -m scripts.plot_report_figures
 python -m unittest discover -s tests -v
 ```
 
@@ -93,6 +99,19 @@ PowerShell 실행 정책에서 활성화를 차단하면 `.\.venv\Scripts\python
 - 수치 단위: 대여 건수/시간. 작을수록 MAE/RMSE가 좋습니다.
 - **중요:** 이 수치는 **원자료가 존재하는 1년 안에서 보지 않은 날짜**를 맞히는 실험입니다. 다른 연도 예측 결과가 아닙니다.
 
+### 최신 보고서용 그래프
+
+실제 데이터와 학습 결과를 통해 생성한 그림이야. 사람이 그리거나 AI로 생성한 대략적인 선이 아니라,
+\`scripts/plot_report_figures.py\`가 원본 CSV와 회귀계수에서 **다시 계산한 수치**로 그린다.
+
+![시간대별 평균 대여량](results/figures/report_hourly_mean.svg)
+
+![테스트의 실측 평균과 M1~M3](results/figures/report_test_profile.svg)
+
+![M1~M4 오차 비교](results/figures/report_model_errors.svg)
+
+![M3 계절별 평균 잔차](results/figures/report_season_bias.svg)
+
 ## 평가 설계와 한계
 
 날짜별로 `season × weekend` 층을 구분하고, `date|seed`의 FNV-1a 해시로
@@ -102,10 +121,11 @@ PowerShell 실행 정책에서 활성화를 차단하면 `.\.venv\Scripts\python
 **실제 관측 353일** 가운데 훈련 243일(5,832시간), 검증 47일(1,121시간),
 테스트 63일(1,512시간)입니다. 일부 날짜는 미운영 시간이 있어 24개보다 적습니다.
 
-- 시간 이외의 날씨·강수·계절·이벤트 차이를 모델 식에는 직접 사용하지 않았습니다.
-- 공휴일과 강우 등 변수는 오차 분석과 후속 개선에 활용할 수 있습니다.
+- M1~M3은 시간 및 주말만 사용했고, M4는 관측 기온·강수량·공휴일·계절 변수를 함께 사용했습니다.
+- M4는 해당 시점의 기상 관측값을 알고 있을 때의 **조건부 수요 예측**입니다. 미래 날씨까지 예측하지 않습니다.
+- M3의 테스트 잔차를 참고해 M4 변수를 선택했으므로 M4 테스트 성능은 완전히 독립적인 최종 검증으로 보지 않습니다.
 - 주기함수는 대여량을 음수로 예측할 수도 있으므로 운영용 예측 시스템으로 쓰려면 제약을 검토해야 합니다.
 - 더 복잡한 모델의 학습 오차는 낮아지더라도 일반화 오차가 반드시 개선되지는 않습니다.
 - 순수한 미래 예측을 평가하려면 **시간순 분할 또는 다른 연도 자료**가 추가로 필요합니다.
 
-자세한 식과 보고서 형식은 [report/analysis.md](report/analysis.md)에 정리했습니다.
+최신 수식, 잔차 분석, 자기평가는 [90점 기준 분석 보고서](report/rubric_90_complete.md)를 기준으로 확인하세요. 이전 버전의 기록은 [report/analysis.md](report/analysis.md)에 남겨두었습니다.
