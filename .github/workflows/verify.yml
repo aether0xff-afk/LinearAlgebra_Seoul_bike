@@ -44,6 +44,19 @@ jobs:
           assert abs(a.iloc[11]["coefficient"] + 918.28708695) < 0.01
           print("M4 coefficients reproduce published calculations")
           PY
+      - name: Render final report figures with Matplotlib
+        run: |
+          python -m scripts.plot_report_figures
+          python - <<'PY'
+          from pathlib import Path
+          p=Path("results/figures")
+          for name in ("report_hourly_mean", "report_test_profile",
+                       "report_model_errors", "report_season_bias"):
+              for extension in ("png", "pdf", "svg"):
+                  f=p/(name+"."+extension)
+                  assert f.is_file() and f.stat().st_size>2000, f
+          print("All four chart sets generated successfully.")
+          PY
       - name: Upload reproducible figures and per-row predictions
         uses: actions/upload-artifact@v4
         with:
