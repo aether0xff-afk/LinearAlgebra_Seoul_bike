@@ -3,14 +3,15 @@
 ## 보고서 · 그래프 · 제출 자료
 
 - **[최신 90점 기준 분석 정리 (Markdown)](report/rubric_90_complete.md)** — M1~M4의 정확한 식, 예측값, 계절별 편향·분산 분석, 한계 및 자기평가.
+- **[최신 분석 기반 Word 기술보고서](submission/Seoul_Bike_90point_technical.docx)** · **[PDF 기술보고서](submission/Seoul_Bike_90point_technical.pdf)** — 7쪽, Word 수식 편집 가능, Matplotlib 그래프 포함. *기존 수행평가 표의 레이아웃을 그대로 재현한 문서는 아님*.
 - **[Matplotlib 그래프 4종](results/figures)** — 실제 원본 CSV에서 다시 계산한 PNG·SVG·벡터 PDF.
 - **[검증된 분석 지표](results/figures/report_model_scores.csv)** — 평균모델과 M1~M4의 MAE·RMSE·R².
 - **[기존 제출용 PDF](submission/서울_공공자전거_수학적모델링_탐구보고서.pdf)** · **[기존 편집용 DOCX](submission/서울_공공자전거_수학적모델링_탐구보고서.docx)**
 
 > **문서 버전 주의:** 위 \`submission/\` PDF·DOCX는 이전 형식으로 생성된 버전이며,
 > 최근 90점 기준의 M4 및 보강된 성찰까지 담은 **최신 보고서와 동일하지 않다**.
-> 최신 분석 내용은 \`report/rubric_90_complete.md\`가 기준이다. 오래된 PDF를 최신 제출본으로 착각하지 않도록 명시한다.
-> PDF/DOCX 자동 생성기는 의도치 않은 덮어쓰기를 막기 위해 수동 실행만 지원한다.
+> 최신 분석 내용은 \`report/rubric_90_complete.md\`가 기준이며, 최신 내용의 별도 기술보고서(DOCX·PDF)는 바로 위 링크에서 받을 수 있다. 기존 양식의 PDF를 최신 제출본으로 착각하지 않도록 명시한다.
+> **예전 양식** PDF/DOCX 생성기는 의도치 않은 덮어쓰기를 막기 위해 수동 실행만 지원한다. 최신 기술보고서는 별도 GitHub Actions 워크플로로 생성한다.
 >
 > 저장소는 **Public**이다. 제출 파일에 학번과 이름이 포함되어 있으므로 공개 범위를 확인해야 한다.
 
