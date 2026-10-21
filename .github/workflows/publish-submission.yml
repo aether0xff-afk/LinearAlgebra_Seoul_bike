@@ -1,12 +1,6 @@
-name: Publish submission documents
+name: Legacy submission builder (manual only)
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - scripts/build_submission.py
-      - scripts/reformat_form.py
-      - .github/workflows/publish-submission.yml
 permissions:
   contents: write
 jobs:
